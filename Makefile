@@ -1,5 +1,9 @@
 CC := cc
 CFLAGS := -Wall -Wextra
+CINCLUDES := -I./includes
 
-server: server.c
-	$(CC) server.c $(CFLAGS) -o server
+SRCS := $(wildcard src/*.c)
+HEADERS := $(wildcard includes/*.h)
+
+server: $(SRCS) $(HEADERS)
+	$(CC) $(SRCS) $(CINCLUDES) $(CFLAGS) -o server

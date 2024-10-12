@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+
+#include "http.h"
 
 int main(int argc, char **argv) {
     /*
@@ -86,8 +89,18 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    char response[] = "HTTP/1.1 200 OK\r\nContent-Type: text/html;\r\n\r\nHello World!";
-    int response_len = sizeof(response) / sizeof(response[0]);
+    char *response;
+
+    struct HTTPRequest req = HTTPRequest_parse(request);
+    if (strcmp(req.path, "/") == 0) {
+        response = "HTTP/1.1 200 OK\r\nContent-Type: text/html;\r\n\r\n<h1>Home Page</h1>";
+    } else if (strcmp(req.path, "/commerce") == 0) {
+        response = "HTTP/1.1 200 OK\r\nContent-Type: text/html;\r\n\r\n<h1>Commerce Page</h1>";
+    } else {
+        response = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html;\r\n\r\n<h1>Not Found</h1>";
+    }
+
+    size_t response_len = strlen(response);
 
     /* Send the response to the client. */
     if (send(client_fd, response, response_len, 0) == -1) {
